@@ -15,6 +15,7 @@ import torchvision
 from mxnet import autograd, gluon, init, nd
 from torch import nn
 #from mxnet.gluon import data as gdata, loss as gloss, model_zoo, nn
+from mxnet.gluon import model_zoo
 import os
 import shutil
 import time
@@ -185,6 +186,7 @@ def evaluate_loss(data_iter, net, devices):
     
     
 # Train Function
+
 def train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,lr_decay):
     trainer = torch.optim.SGD(net.parameters(), lr=lr, momentum=0.9,weight_decay=wd)
     scheduler = torch.optim.lr_scheduler.StepLR(trainer, lr_period, lr_decay)
