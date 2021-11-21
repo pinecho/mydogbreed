@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
-# Kaggle：Dog Breeed identification （ImageNet Dogs）
 # 120 categories, different size with CIFAR-10
-
 # 10222 train images; 10357 test images.
 
 # import packages and modules
@@ -15,11 +13,11 @@ import torchvision
 from mxnet import autograd, gluon, init, nd
 from torch import nn
 #from mxnet.gluon import data as gdata, loss as gloss, model_zoo, nn
+from mxnet.gluon import model_zoo
 import os
 import shutil
 import time
 import zipfile
-
 
 # 1.Unzip dataset.
 print('-----###Part-1: Unzip datasets###-----Start')
