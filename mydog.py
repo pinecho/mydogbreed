@@ -149,9 +149,12 @@ print('-----###Part-3: Load datasets###-----End')
 
 
 #5. Define the model
+def get_net():
+    num_classes = len(set(labels.values()))
+    net = d2l.resnet18(num_classes, 3)
+    return net
 
-
-#define loss function
+#6. define loss function
 loss = torch.nn.CrossEntropyLoss(reduction="none")
 def evaluate_loss(data_iter, net, devices):
     l_sum, n = 0.0, 0
@@ -178,15 +181,14 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,lr
             l, acc = d2l.train_batch_ch13(net, features, labels, loss,trainer, devices)
             metric.add(l, acc, labels.shape[0])
             timer.stop()
-            print(f'loss {metric[0] / metric[2]:.3f}, 'f'train acc {metric[1] / metric[2]:.3f}, ')
+            if (i + 1) % (num_batches // 5) == 0 or i == num_batches - 1:
+                print(f'loss {metric[0] / metric[2]:.3f}, 'f'train acc {metric[1] / metric[2]:.3f}, ')
         if valid_iter is not None:
             valid_acc = d2l.evaluate_accuracy_gpu(net, valid_iter)
             print(f'valid acc {valid_acc:.3f}')
         scheduler.step()
     if valid_iter is not None:
-        print(f'loss {metric[0] / metric[2]:.3f}, '
-              f'train acc {metric[1] / metric[2]:.3f}, '
-              f'valid acc {valid_acc:.3f}')
+        print(f'loss {metric[0] / metric[2]:.3f}, 'f'train acc {metric[1] / metric[2]:.3f}, 'f'valid acc {valid_acc:.3f}')
     else:
         print('Final result is : ' f'loss {metric[0] / metric[2]:.3f}, 'f'train acc {metric[1] / metric[2]:.3f}')
     print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec 'f'on {str(devices)}')
