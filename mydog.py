@@ -10,21 +10,24 @@ from d2l import torch as d2l
 import math
 import torch
 import torchvision
-from mxnet import autograd, gluon, init, nd
+#from mxnet import autograd, gluon, init, nd
 from torch import nn
+import pandas as pd
 #from mxnet.gluon import data as gdata, loss as gloss, model_zoo, nn
-from mxnet.gluon import model_zoo
+#from mxnet.gluon import model_zoo
 import os
 import shutil
 import time
 import zipfile
+
+data_dir = '/scratch/c.c21021656/Datasets/DogBreed'
 
 # 1.Unzip dataset.
 print('-----###Part-1: Unzip datasets###-----Start')
 # The dataset will not be unzipped or reorganized again if the flages below is set TRUE
 DataIsUnzipped = True
 DataIsReorg = True
-data_dir = '/scratch/c.c21021656/Datasets/DogBreed'
+
 if DataIsUnzipped:
     print('---Datas have been unzipped already.')
 else:
@@ -40,7 +43,6 @@ else:
       z.extractall(data_dir)
     print('---Finished unzip dataset, please check') 
 print('-----###Part-1: Unzip datasets###-----End')
-
 
 # 2.Reorganize dataset
 print('-----###Part-2: Reorganize datasets###-----Start')
@@ -156,17 +158,7 @@ def get_net():
 
 #6. define loss function
 loss = torch.nn.CrossEntropyLoss(reduction="none")
-def evaluate_loss(data_iter, net, devices):
-    l_sum, n = 0.0, 0
-    for features, labels in data_iter:
-        features, labels = features.to(devices[0]), labels.to(devices[0])
-        outputs = net(features)
-        l = loss(outputs, labels)
-        l_sum = l.sum()
-        n += labels.numel()
-    return l_sum / n
-    
-    
+ 
 # Train Function
 def train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,lr_decay):
     trainer = torch.optim.SGD(net.parameters(), lr=lr, momentum=0.9,weight_decay=wd)
@@ -193,30 +185,26 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,lr
         print('Final result is : ' f'loss {metric[0] / metric[2]:.3f}, 'f'train acc {metric[1] / metric[2]:.3f}')
     print(f'{metric[2] * num_epochs / timer.sum():.1f} examples/sec 'f'on {str(devices)}')
 
-
-
 # train the model
 print('-----###Part-4: Training###-----Start')
 print('---try_all_gpus:',d2l.try_all_gpus())
-ctx, num_epochs, lr, wd = d2l.try_all_gpus(), 80, 0.01, 1e-4
-lr_period, lr_decay, net = 10, 0.1, get_net()
-train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period, lr_decay)
 
+devices, num_epochs, lr, wd = d2l.try_all_gpus(), 50, 2e-4, 5e-4
+lr_period, lr_decay, net = 4, 0.9, get_net()
+train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period, lr_decay)
 
 # Classify the test set and generate output.
 net = get_net()
-train(net, train_valid_iter, None, num_epochs, lr, wd, ctx, lr_period,lr_decay)
+train(net, train_valid_iter, None, num_epochs, lr, wd, devices, lr_period,lr_decay)
 
 preds = []
-for data, label in test_iter:
-    output_features = net.features(data.as_in_context(ctx))
-    output = nd.softmax(net.output_new(output_features))
-    preds.extend(output.asnumpy())
-ids = sorted(os.listdir(os.path.join(data_dir, input_dir, 'test/unknown')))
-with open('submission2.csv', 'w') as f:
-    f.write('id,' + ','.join(train_valid_ds.synsets) + '\n')
-    for i, output in zip(ids, preds):
-        f.write(i.split('.')[0] + ',' + ','.join(
-            [str(num) for num in output]) + '\n')
-            
+
+for X, _ in test_iter:
+    y_hat = net(X.to(devices[0]))
+    preds.extend(y_hat.argmax(dim=1).type(torch.int32).cpu().numpy())
+sorted_ids = list(range(1, len(test_ds) + 1))
+sorted_ids.sort(key=lambda x: str(x))
+df = pd.DataFrame({'id': sorted_ids, 'label': preds})
+df['label'] = df['label'].apply(lambda x: train_valid_ds.classes[x])
+df.to_csv('submission3.csv', index=False)            
 print('-----###Part-4: Training###-----End')
