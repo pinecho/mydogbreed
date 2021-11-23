@@ -1,0 +1,25 @@
+ccs2104: Warning: Permanently added the RSA host key for IP address '10.212.3.154' to the list of known hosts.
+Currently Loaded Modulefiles:
+  1) anaconda/2019.07   2) pytorch/1.4        3) CUDA/9.2
+Traceback (most recent call last):
+  File "mydog.py", line 203, in <module>
+    y_hat = net(X.to(devices[0]))
+  File "/apps/machine-learning/pytorch/1.4/pytorch-1.4/lib/python3.8/site-packages/torch/nn/modules/module.py", line 532, in __call__
+    result = self.forward(*input, **kwargs)
+  File "/apps/machine-learning/pytorch/1.4/pytorch-1.4/lib/python3.8/site-packages/torch/nn/modules/container.py", line 100, in forward
+    input = module(input)
+  File "/apps/machine-learning/pytorch/1.4/pytorch-1.4/lib/python3.8/site-packages/torch/nn/modules/module.py", line 532, in __call__
+    result = self.forward(*input, **kwargs)
+  File "/apps/machine-learning/pytorch/1.4/pytorch-1.4/lib/python3.8/site-packages/torch/nn/modules/container.py", line 100, in forward
+    input = module(input)
+  File "/apps/machine-learning/pytorch/1.4/pytorch-1.4/lib/python3.8/site-packages/torch/nn/modules/module.py", line 532, in __call__
+    result = self.forward(*input, **kwargs)
+  File "/home/c.c21021656/.local/lib/python3.8/site-packages/d2l/torch.py", line 535, in forward
+    Y = F.relu(self.bn1(self.conv1(X)))
+  File "/apps/machine-learning/pytorch/1.4/pytorch-1.4/lib/python3.8/site-packages/torch/nn/modules/module.py", line 532, in __call__
+    result = self.forward(*input, **kwargs)
+  File "/apps/machine-learning/pytorch/1.4/pytorch-1.4/lib/python3.8/site-packages/torch/nn/modules/batchnorm.py", line 104, in forward
+    return F.batch_norm(
+  File "/apps/machine-learning/pytorch/1.4/pytorch-1.4/lib/python3.8/site-packages/torch/nn/functional.py", line 1668, in batch_norm
+    return torch.batch_norm(
+RuntimeError: CUDA out of memory. Tried to allocate 392.00 MiB (GPU 0; 15.78 GiB total capacity; 14.28 GiB already allocated; 29.50 MiB free; 14.79 GiB reserved in total by PyTorch)
