@@ -174,7 +174,7 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,lr
             metric.add(l, acc, labels.shape[0])
             timer.stop()
             if (i + 1) % (num_batches // 5) == 0 or i == num_batches - 1:
-                print(f'loss {metric[0] / metric[2]:.3f}, 'f'train acc {metric[1] / metric[2]:.3f}, ')
+                print(f'epoch {epoch}', f'loss {metric[0] / metric[2]:.3f}, 'f'train acc {metric[1] / metric[2]:.3f}, ')
         if valid_iter is not None:
             valid_acc = d2l.evaluate_accuracy_gpu(net, valid_iter)
             print(f'valid acc {valid_acc:.3f}')
@@ -189,7 +189,7 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period,lr
 print('-----###Part-4: Training###-----Start')
 print('---try_all_gpus:',d2l.try_all_gpus())
 
-devices, num_epochs, lr, wd = d2l.try_all_gpus(), 50, 2e-4, 5e-4
+devices, num_epochs, lr, wd = d2l.try_all_gpus(), 100, 2e-4, 5e-4
 lr_period, lr_decay, net = 4, 0.9, get_net()
 train(net, train_iter, valid_iter, num_epochs, lr, wd, devices, lr_period, lr_decay)
 
